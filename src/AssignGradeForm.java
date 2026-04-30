@@ -7,11 +7,11 @@ public class AssignGradeForm extends JDialog {
     private JTextField studentIdField;
     private JTextField courseField;
     private JTextField gradeField;
-    private StudentManagementSystem parent; 
+    private StudentManagementSystem parent;
 
     public AssignGradeForm(JFrame parent) {
         super(parent, "Assign Grade", true);
-        this.parent = (StudentManagementSystem) parent; 
+        this.parent = (StudentManagementSystem) parent;
         setSize(400, 200);
         setLayout(new GridLayout(5, 2));
 
@@ -25,7 +25,6 @@ public class AssignGradeForm extends JDialog {
         gradeField = new JTextField();
         add(gradeField);
 
-        // Create the Assign button 
         JButton assignButton = new JButton("Assign");
         assignButton.addActionListener(new ActionListener() {
             @Override
@@ -37,13 +36,28 @@ public class AssignGradeForm extends JDialog {
 
         setLocationRelativeTo(parent);
     }
-    
+
     private void handleAssignButtonClick() {
-        String studentId = studentIdField.getText();
-        String course = courseField.getText();
-        String grade = gradeField.getText();
+        String studentId = studentIdField.getText().trim();
+        String course = courseField.getText().trim();
+        String grade = gradeField.getText().trim();
+
+        // Bug fix #3: validate all fields, student existence, and course enrollment
+        if (studentId.isEmpty() || course.isEmpty() || grade.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "All fields are required.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!parent.studentExists(studentId)) {
+            JOptionPane.showMessageDialog(this, "Student ID not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!parent.isEnrolledInCourse(studentId, course)) {
+            JOptionPane.showMessageDialog(this, "Student is not enrolled in " + course + ".", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         parent.assignGrade(studentId, course, grade);
-        setVisible(false); 
+        JOptionPane.showMessageDialog(this, "Grade assigned successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+        setVisible(false);
     }
 }

@@ -8,10 +8,9 @@ public class AddStudentForm extends JDialog {
     private JTextField nameField;
     private StudentManagementSystem parent;
 
-
     public AddStudentForm(StudentManagementSystem parent) {
         super(parent, "Add Student", true);
-        this.parent = parent; 
+        this.parent = parent;
         setSize(400, 200);
         setLayout(new GridLayout(3, 2));
 
@@ -22,7 +21,6 @@ public class AddStudentForm extends JDialog {
         idField = new JTextField();
         add(idField);
 
-        // Create the "Add" button and add an action listener
         JButton addButton = new JButton("Add");
         addButton.addActionListener(new ActionListener() {
             @Override
@@ -36,23 +34,24 @@ public class AddStudentForm extends JDialog {
     }
 
     private void handleSubmitButtonClick() {
-        String id = idField.getText();
-        String name = nameField.getText();
+        String id = idField.getText().trim();
+        String name = nameField.getText().trim();
 
-        // Validate inputs
+        // Bug fix #1: validate ID is not empty and not a duplicate
+        if (id.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "ID cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (parent.studentExists(id)) {
+            JOptionPane.showMessageDialog(this, "A student with this ID already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         if (name.isEmpty() || !name.matches("[a-zA-Z\\s]+")) {
             JOptionPane.showMessageDialog(this, "Invalid name. Please enter a name without numbers.", "Error", JOptionPane.ERROR_MESSAGE);
-            return; 
+            return;
         }
-        parent.addNewStudent(id, name);
-        setVisible(false); 
-    }
 
-    public String getEnteredId() {
-        return idField.getText();
-    }
-    public String getEnteredName() {
-        return nameField.getText();
+        parent.addStudentToTable(id, name);
+        setVisible(false);
     }
 }
-
